@@ -95,4 +95,3 @@ We hope you find Sarvam AI in 1P useful and look forward to your contributions!
 
 ---
 
-*This README file is a template and should be modified according to the specific details and structure of your project.*
