@@ -17,7 +17,7 @@ function App() {
   const [showAllCategories, setShowAllCategories] = useState(false);
 
   useEffect(() => {
-    fetch('https://script.google.com/macros/s/AKfycbwOAxbJp-h_hB1fPttBmEmkNXzu3V913i_NPxIrv0eAdJV0THFe0lpI9QrBeBcHLVBe/exec')
+    fetch('yourapikey')
       .then(response => response.json())
       .then(data => {
         const fetchedData = data.data;
