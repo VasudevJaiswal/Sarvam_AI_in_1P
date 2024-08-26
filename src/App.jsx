@@ -1,49 +1,58 @@
-// src/App.js
+// src/components/App.jsx
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header';
 import CardContainer from './components/CardContainer';
 import Search from './components/Search';
 import Filter from './components/Filter';
-import Footer from './components/Footer'; // Import the Footer component
-import data from './data/data'; // Import your data
+import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
-  const [filteredData, setFilteredData] = useState(data);
-  const [filter, setFilter] = useState('all');
-
-  const handleDataChange = (filteredData) => {
-    setFilteredData(filteredData);
-  };
+  const [tools, setTools] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [filter, setFilter] = useState('All');
+  const [filterOptions, setFilterOptions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   useEffect(() => {
-    // Filter data based on category filter
-    if (filter === 'all') {
-      setFilteredData(data);
-    } else {
-      const filteredData = data.filter(card => card.category === filter);
-      setFilteredData(filteredData);
-    }
-  }, [filter]);
+    fetch('https://script.google.com/macros/s/AKfycbwOAxbJp-h_hB1fPttBmEmkNXzu3V913i_NPxIrv0eAdJV0THFe0lpI9QrBeBcHLVBe/exec')
+      .then(response => response.json())
+      .then(data => {
+        const fetchedData = data.data;
+        setTools(fetchedData);
+        setFilteredData(fetchedData);
+
+        // Dynamically generate filter options from the `primary_task` field
+        const uniqueCategories = [...new Set(fetchedData.map(item => item.primary_task))];
+        setFilterOptions(['All', ...uniqueCategories.sort()]); // Include 'All' at the top
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  useEffect(() => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const filtered = tools
+      .filter(card => filter === 'All' || card.primary_task === filter)
+      .filter(card => card.company_name.toLowerCase().includes(lowerCaseSearchTerm));
+
+    setFilteredData(filtered);
+  }, [filter, tools, searchTerm]);
 
   return (
     <div className="App">
       <Header />
       <div className="controls">
-        <Search data={data} setData={handleDataChange} />
-        <Filter setFilter={setFilter} />
+        <Search setSearchTerm={setSearchTerm} />
+        <Filter 
+          filterOptions={filterOptions} 
+          setFilter={setFilter} 
+        />
       </div>
-      <div className="card-container">
-        {filteredData.map(card => (
-          <div className="card" key={card.title}>
-            <img src={card.image} alt={card.title} />
-            <h2>{card.title}</h2>
-            <p>{card.description}</p>
-            <a href={card.link} target="_blank" rel="noopener noreferrer">View Details</a>
-          </div>
-        ))}
-      </div>
-      <Footer /> {/* Add the Footer component */}
+      <CardContainer data={filteredData} />
+      <ScrollToTop />
+      <Footer />
     </div>
   );
 }

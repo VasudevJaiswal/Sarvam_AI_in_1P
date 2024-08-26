@@ -1,14 +1,24 @@
 // src/components/Filter.js
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const Filter = ({ setFilter }) => {
+const Filter = ({ filterOptions, setFilter }) => {
   return (
     <div className="filter">
-      <button onClick={() => setFilter('all')}>All</button>
-      <button onClick={() => setFilter('free')}>Free</button>
-      <button onClick={() => setFilter('paid')}>Paid</button>
+      <select onChange={(e) => setFilter(e.target.value)}>
+        {filterOptions.map(option => (
+          <option key={option} value={option}>
+            {option.charAt(0).toUpperCase() + option.slice(1)}
+          </option>
+        ))}
+      </select>
     </div>
   );
+};
+
+Filter.propTypes = {
+  filterOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setFilter: PropTypes.func.isRequired,
 };
 
 export default Filter;
